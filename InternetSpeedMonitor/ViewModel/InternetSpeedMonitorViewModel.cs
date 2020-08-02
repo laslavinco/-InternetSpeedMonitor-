@@ -1,5 +1,4 @@
 ﻿using InternetSpeedMonitor.Model;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Timers;
@@ -10,6 +9,8 @@ namespace InternetSpeedMonitor.ViewModel
     {
         private SpeedMonitor _speedMonitor;
         private static Timer _timer;
+        private double _downloadSpeed;
+        private double _uploadSpeed;
         public event PropertyChangedEventHandler PropertyChanged;
 
         public InternetSpeedMonitorViewModel()
@@ -52,16 +53,14 @@ namespace InternetSpeedMonitor.ViewModel
 
         }
 
-        private double _downloadSpeed;
-        private double _uploadSpeed;
-
+             
         public double DownloadSpeed
         {   get
             {
                 return _downloadSpeed;
             }
             set
-            {
+            {   
                 _downloadSpeed = value;
                 OnPropertyChanged();
             }

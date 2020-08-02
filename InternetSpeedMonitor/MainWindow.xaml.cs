@@ -1,5 +1,7 @@
 ﻿using InternetSpeedMonitor.ViewModel;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 
 namespace InternetSpeedMonitor
@@ -14,22 +16,38 @@ namespace InternetSpeedMonitor
 
         public MainWindow()
         {
+            if (IsWindowOpen("InternetSpeedMonitor"))
+                ShutdownApp();
             InitializeComponent();
             this.DataContext = new InternetSpeedMonitorViewModel();
             this.MouseDown += PnMouseDown;
             this.MouseUp += PnMouseUp;
             this.MouseMove += PnMouseMove;
-            GetTaskBarPosition();
+            SetMainWindowPosition();
+        }
+        
+        private void ShutdownApp()
+        {
+            System.Windows.Application.Current.Shutdown();
         }
 
-        public int GetTaskBarPosition()
+        public static bool IsWindowOpen(string processName)
         {
-            int position = 0;
-            double width = System.Windows.SystemParameters.WorkArea.Width;
-            double height = System.Windows.SystemParameters.WorkArea.Height;
-            this.Left = width - (width * 8) / 100;
-            this.Top = height - (height * 10) / 100;
-            return position;
+            Process[] allProcess = Process.GetProcessesByName(processName);
+            return (allProcess.Count() > 1);
+        }
+
+        public void SetMainWindowPosition()
+        {
+            double systemWidth = System.Windows.SystemParameters.WorkArea.Width;
+            double systemHeight = System.Windows.SystemParameters.WorkArea.Height;
+            double appWidth = this.Width;
+            double appHeight = this.Height;
+
+            this.Left = systemWidth - appWidth;
+            this.Top = systemHeight - appHeight;
+
+
         }
 
         void PnMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
@@ -58,5 +76,23 @@ namespace InternetSpeedMonitor
                 this.lmAbs = MousePositionAbs;
             }
         }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            var messageBoxResutlts = MessageBox.Show(Application.Current.MainWindow, "Are you sure you want to close ?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (messageBoxResutlts == MessageBoxResult.Yes)
+                ShutdownApp(); 
+        }
+
+        private void PinOnTopButtonClicked(object sender, RoutedEventArgs e)
+        {
+            this.Topmost = !(this.Topmost);
+        }
+
     }
 }

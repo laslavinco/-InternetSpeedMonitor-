@@ -5,10 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InternetSpeedMonitor"
         mc:Ignorable="d"
-        Title="Internet Speed Monitor" Height="60" Width="120"
+        Title="Internet Speed Monitor" Height="200" Width="320"
+        Name="InternetSpeedMonitor"
         WindowStartupLocation="Manual"
-        Topmost="True"
-        WindowStyle="None">
+        Topmost="False"
+        WindowStyle="None"
+        ResizeMode="NoResize">
 
     <Grid Margin="1">
         <Grid.ColumnDefinitions>
@@ -16,12 +18,29 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.45*"/>
+            <RowDefinition Height="0.5*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock x:Name="downloadText" Text="v" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-        <TextBlock x:Name="downloadTextBlock" Text="{Binding DownloadSpeed}" Grid.Row="1" Grid.Column="0" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="uploadText" Text="^" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
-        <TextBlock x:Name="uploadTextBlock" Text="{Binding UploadSpeed}" Grid.Column="1" Grid.Row="1" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
+            <ToggleButton x:Name="PinOnTopButton" Margin="4" Click="PinOnTopButtonClicked">
+                <Image Source="Resources/pin.ico"/>
+            </ToggleButton>
+            <Button x:Name="MinimizeButton" Margin="4" Click="MinimizeButton_Click">
+                <Image Source="Resources/mini.ico"/>
+            </Button>
+            <Button x:Name="CloseButton" Margin="4" Click="CloseButton_Click">
+                <Image Source="Resources/close.ico"/>
+            </Button>
+        </StackPanel>
+        <Rectangle Grid.Row="1" Fill="LightGreen" Grid.ColumnSpan="2"/>
+        <Image Source="appIcon.ico" HorizontalAlignment="Left" Margin="5" Grid.Row="1"/>
+        <TextBlock x:Name="TitleTextBlock" Text="Internet Speed Monitor" Foreground="Black" Grid.Row="1" Margin="60 12 0 0" FontSize="18" FontWeight="ExtraBold" Grid.ColumnSpan="2"/>
+        <Image x:Name="downloadIcon" Source="Resources/downArrow.ico" Margin="10" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+        </Image>
+        <TextBlock x:Name="downloadTextBlock" Text="{Binding DownloadSpeed}" Grid.Row="3" Grid.Column="0" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Image x:Name="uploadIcon" Source="Resources/upArrow.ico" Margin="10" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBlock x:Name="uploadTextBlock" Text="{Binding UploadSpeed}" Grid.Column="1" Grid.Row="3" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>
     </Grid>
 </Window>
