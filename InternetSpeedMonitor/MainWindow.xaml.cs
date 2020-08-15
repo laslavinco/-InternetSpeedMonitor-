@@ -2,7 +2,10 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace InternetSpeedMonitor
 {
@@ -19,16 +22,17 @@ namespace InternetSpeedMonitor
             if (IsWindowOpen("InternetSpeedMonitor"))
                 ShutdownApp();
             InitializeComponent();
+            
             this.DataContext = new InternetSpeedMonitorViewModel();
             this.MouseDown += PnMouseDown;
             this.MouseUp += PnMouseUp;
             this.MouseMove += PnMouseMove;
             SetMainWindowPosition();
         }
-        
+
         private void ShutdownApp()
         {
-            System.Windows.Application.Current.Shutdown();
+            Application.Current.Shutdown();
         }
 
         public static bool IsWindowOpen(string processName)
@@ -39,15 +43,38 @@ namespace InternetSpeedMonitor
 
         public void SetMainWindowPosition()
         {
-            double systemWidth = System.Windows.SystemParameters.WorkArea.Width;
-            double systemHeight = System.Windows.SystemParameters.WorkArea.Height;
+            double systemWidth = SystemParameters.WorkArea.Width;
+            double systemHeight = SystemParameters.WorkArea.Height;
             double appWidth = this.Width;
             double appHeight = this.Height;
 
             this.Left = systemWidth - appWidth;
             this.Top = systemHeight - appHeight;
 
+        }
 
+        public static bool IsConnectedToInternet()
+        {
+            try
+            {
+                using (var client = new WebClient())
+                using (var stream = client.OpenRead("http://www.google.com"))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void CheckPing()
+        {
+            if (!IsConnectedToInternet())
+                NetworkConnectionIcon.Source = (ImageSource)FindResource("Disconnected");
+            else
+                NetworkConnectionIcon.Source = (ImageSource)FindResource("Connected");
         }
 
         void PnMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
@@ -94,5 +121,11 @@ namespace InternetSpeedMonitor
             this.Topmost = !(this.Topmost);
         }
 
+        private void DownloadTextBlock_TargetUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
+        {
+            TextBlock downloadTextBlock = sender as TextBlock;
+            if ( Int32.Parse(downloadTextBlock.Text) == 0)
+                CheckPing();
+        }
     }
 }

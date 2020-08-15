@@ -11,30 +11,34 @@ namespace InternetSpeedMonitor.ViewModel
         private static Timer _timer;
         private double _downloadSpeed;
         private double _uploadSpeed;
+        private double _networkSpeed;
+        private double _downloadedData;
+        private double _uploadedData;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public InternetSpeedMonitorViewModel()
         {
             _speedMonitor = new SpeedMonitor();
+            SetTimer();
+        }
+
+        private void SetStats()
+        {
             _speedMonitor.GetNetworkUsage();
             DownloadSpeed = _speedMonitor.DownloadSpeed;
             UploadSpeed = _speedMonitor.UploadSpeed;
-            SetTimer();
+            NetworkSpeed = _speedMonitor.NetworkSpeed;
+            DownloadedData = _speedMonitor.DownloadedData;
+            UploadedData = _speedMonitor.UploadedData;
         }
 
         private void SetTimer()
         {
             _timer = new Timer(1000);
-            _timer.Elapsed += OnTimedEvent;
+            _timer.Elapsed += (sender, e) => { SetStats(); } ;
             _timer.AutoReset = true;
             _timer.Enabled = true;
-        }
-
-        private void OnTimedEvent(object sender, ElapsedEventArgs e)
-        {
-            _speedMonitor.GetNetworkUsage();
-            DownloadSpeed = _speedMonitor.DownloadSpeed;
-            UploadSpeed = _speedMonitor.UploadSpeed;
         }
 
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -53,7 +57,46 @@ namespace InternetSpeedMonitor.ViewModel
 
         }
 
-             
+        public double DownloadedData
+        {
+            get
+            {
+                return _downloadedData; 
+            }
+            set
+            {
+                _downloadedData = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double UploadedData
+        {
+            get
+            {
+                return _uploadedData;
+            }
+            set
+            {
+                _uploadedData = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        public double NetworkSpeed
+        {
+            get
+            {
+                return _networkSpeed;
+            }
+            set
+            {
+                _networkSpeed = value;
+                OnPropertyChanged();
+            }
+        }
+
         public double DownloadSpeed
         {   get
             {

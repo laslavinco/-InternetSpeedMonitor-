@@ -163,6 +163,10 @@
   <ItemGroup>
     <Resource Include="Resources\appIcon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\connected.ico" />
+    <Resource Include="Resources\disconnected.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
