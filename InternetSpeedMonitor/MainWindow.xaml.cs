@@ -1,11 +1,9 @@
 ﻿using InternetSpeedMonitor.ViewModel;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace InternetSpeedMonitor
 {
@@ -16,13 +14,15 @@ namespace InternetSpeedMonitor
     {
         private bool clicked = false;
         private Point lmAbs = new Point();
-
+        private System.Windows.Forms.NotifyIcon ni;
         public MainWindow()
         {
             if (IsWindowOpen("InternetSpeedMonitor"))
                 ShutdownApp();
             InitializeComponent();
-            
+
+            this.SetupSystemTrayIcon();
+
             this.DataContext = new InternetSpeedMonitorViewModel();
             this.MouseDown += PnMouseDown;
             this.MouseUp += PnMouseUp;
@@ -30,6 +30,33 @@ namespace InternetSpeedMonitor
             SetMainWindowPosition();
         }
 
+        protected override void OnStateChanged(EventArgs e)
+        {
+            if (WindowState == System.Windows.WindowState.Minimized)
+                this.Hide();
+
+            base.OnStateChanged(e);
+        }
+
+        private void SetupSystemTrayIcon()
+        {
+            System.Windows.Forms.NotifyIcon icon = new System.Windows.Forms.NotifyIcon();
+            icon.Icon = new System.Drawing.Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Resources/appIcon.ico")).Stream);
+            ni = new System.Windows.Forms.NotifyIcon();
+            ni.Icon = new System.Drawing.Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Resources/appIcon.ico")).Stream);
+
+            ni.Visible = true;
+            ni.DoubleClick +=
+                delegate (object sender, EventArgs args)
+                {
+                    var x = sender as System.Windows.Forms.NotifyIcon;
+                    x.Visible = false;
+                    this.Show();
+                    this.WindowState = WindowState.Normal;
+                };
+        }
+
+        
         private void ShutdownApp()
         {
             Application.Current.Shutdown();
@@ -51,30 +78,6 @@ namespace InternetSpeedMonitor
             this.Left = systemWidth - appWidth;
             this.Top = systemHeight - appHeight;
 
-        }
-
-        public static bool IsConnectedToInternet()
-        {
-            try
-            {
-                using (var client = new WebClient())
-                using (var stream = client.OpenRead("http://www.google.com"))
-                {
-                    return true;
-                }
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public void CheckPing()
-        {
-            if (!IsConnectedToInternet())
-                NetworkConnectionIcon.Source = (ImageSource)FindResource("Disconnected");
-            else
-                NetworkConnectionIcon.Source = (ImageSource)FindResource("Connected");
         }
 
         void PnMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
@@ -107,13 +110,14 @@ namespace InternetSpeedMonitor
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
+            this.ni.Visible = true;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             var messageBoxResutlts = MessageBox.Show(Application.Current.MainWindow, "Are you sure you want to close ?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (messageBoxResutlts == MessageBoxResult.Yes)
-                ShutdownApp(); 
+                ShutdownApp();
         }
 
         private void PinOnTopButtonClicked(object sender, RoutedEventArgs e)
@@ -121,11 +125,5 @@ namespace InternetSpeedMonitor
             this.Topmost = !(this.Topmost);
         }
 
-        private void DownloadTextBlock_TargetUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
-        {
-            TextBlock downloadTextBlock = sender as TextBlock;
-            if ( Int32.Parse(downloadTextBlock.Text) == 0)
-                CheckPing();
-        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
@@ -10,18 +11,29 @@ namespace InternetSpeedMonitor.Model
         
         private long _PreBytesSent = 0, _PreBytesReceived = 0;
 
+        [System.Runtime.InteropServices.DllImport("wininet.dll")]
+        private extern static bool InternetGetConnectedState(out int Description, int ReservedValue);
+
+
         public SpeedMonitor()
         {
-            Task.Run((Action)GetNetworkUsage);
+            Task.Run( () => GetNetworkUsage() );
         }
 
-        public void GetNetworkUsage()
+        public NetworkInterface[] GetAvailableNetworkInterfaces()
         {
-            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+            return NetworkInterface.GetAllNetworkInterfaces();
+        }
+
+        public void GetNetworkUsage(string NetworkInterface="Wi-Fi")
+        {
+            IsConnected = IsConnectedToInternet();
+
+            NetworkInterface[] adapters = GetAvailableNetworkInterfaces();
             NetworkInterface networkInterface = null;
             foreach (var i in adapters)
             {
-                if (i.Name == "Wi-Fi")
+                if (i.Name == NetworkInterface)
                 {
                     networkInterface = i;
                     break;
@@ -47,12 +59,40 @@ namespace InternetSpeedMonitor.Model
 
         }
 
+        public bool IsConnectedToInternet()
+        {
+            if (!CheckNet())
+            {
+                try
+                {
+                    using (var client = new WebClient())
+                    using (var stream = client.OpenRead("https://google.com/generate_204"))
+                    {
+                        return true;
+                    }
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            return true;
+
+        }
+
+        public static bool CheckNet()
+        {
+            int desc;
+            return InternetGetConnectedState(out desc, 0);
+        }
+
 
         public double DownloadedData { get; set; }
         public double UploadedData { get; set; }
         public double NetworkSpeed { get; set; }
         public double DownloadSpeed { get; set; }
         public double UploadSpeed { get; set; }
+        public bool IsConnected { get; private set; }
 
     }
 }

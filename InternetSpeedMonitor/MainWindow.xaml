@@ -4,25 +4,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InternetSpeedMonitor"
+        xmlns:vm="clr-namespace:InternetSpeedMonitor.ViewModel"
         mc:Ignorable="d"
         Title="Internet Speed Monitor" Height="200" Width="330"
         Name="InternetSpeedMonitor"
+        Icon="Resources/appIcon.ico"
         WindowStartupLocation="Manual"
         Topmost="False"
         WindowStyle="None"
         ResizeMode="NoResize">
 
     <Window.Resources>
+        <BitmapImage x:Key="AppIcon" UriSource="Resources/appIcon.ico"/>
         <BitmapImage x:Key="Connected" UriSource="Resources/connected.ico"/>
         <BitmapImage x:Key="Disconnected" UriSource="Resources/disconnected.ico"/>
-        <ControlTemplate x:Key="validationTemplate">
-            <Grid>
-                <Label Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Center">Please insert a integer</Label>
-                <Border BorderThickness="1" BorderBrush="Red">
-                    <AdornedElementPlaceholder />
-                </Border>
-            </Grid>
-        </ControlTemplate>
     </Window.Resources>
     
 
@@ -33,9 +28,10 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.5*"/>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="0.7*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.9*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -52,12 +48,14 @@
         </StackPanel>
 
         <Rectangle Grid.Row="1" Fill="LightGreen" Grid.ColumnSpan="2"/>
-        <Image x:Name="NetworkConnectionIcon" Source="{DynamicResource ResourceKey=Disconnected}" HorizontalAlignment="Left" Margin="5" Grid.Row="1"/>
-        <TextBlock x:Name="TitleTextBlock" Text="Internet Speed Monitor" Foreground="Black" Grid.Row="1" Margin="60 12 0 0" FontSize="18" FontWeight="ExtraBold" Grid.ColumnSpan="2"/>
+        <Image x:Name="NetworkConnectionIcon" Source="{Binding ConnectionStatus}" HorizontalAlignment="Left" Grid.Row="1"/>
+        <TextBlock x:Name="TitleTextBlock" Text="Internet Speed Monitor" Foreground="Black" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="18" FontWeight="ExtraBold" Grid.ColumnSpan="2"/>
+
+
+        <Label Content="Select Network interface" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="3" FontSize="12" FontWeight="DemiBold" Grid.Row="2" Grid.Column="0"/>
+        <ComboBox x:Name="NetworkInterfaceList" Grid.Row="2" Grid.Column="2" ItemsSource="{Binding NetworkInterfaces}" DisplayMemberPath="Name" SelectedValue="{Binding SelectedInterface}" SelectedValuePath="Name" Margin="6"/>
         
-        
-        
-        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="3">
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="3">
             
             <TextBlock x:Name="NetworkSpeedLable" Text="Total Speed :" Margin="3" FontSize="12" FontWeight="DemiBold"/>
             <TextBlock x:Name="NetworkSpeed" Text="{Binding NetworkSpeed}" Margin="3" FontSize="12" FontWeight="DemiBold"/>
@@ -78,13 +76,13 @@
 
         </StackPanel>
 
-        <StackPanel Orientation="Vertical" Grid.Row="3" Grid.ColumnSpan="2">
+        <StackPanel Orientation="Vertical" Grid.Row="4" Grid.ColumnSpan="2">
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
         </StackPanel>
 
-        <Image x:Name="downloadIcon" Source="Resources/downArrow.ico" Margin="10" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <TextBlock x:Name="downloadTextBlock" Text="{Binding DownloadSpeed, NotifyOnTargetUpdated=True}" TargetUpdated="DownloadTextBlock_TargetUpdated" Grid.Row="4" Grid.Column="0" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <Image x:Name="uploadIcon" Source="Resources/upArrow.ico" Margin="10" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <TextBlock x:Name="uploadTextBlock" Text="{Binding UploadSpeed}" Grid.Column="1" Grid.Row="4" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Image x:Name="downloadIcon" Source="Resources/downArrow.ico" Margin="10" Grid.Column="0" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBlock x:Name="downloadTextBlock" Text="{Binding DownloadSpeed}" Grid.Row="5" Grid.Column="0" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Image x:Name="uploadIcon" Source="Resources/upArrow.ico" Margin="10" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBlock x:Name="uploadTextBlock" Text="{Binding UploadSpeed}" Grid.Column="1" Grid.Row="5" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>
     </Grid>
 </Window>

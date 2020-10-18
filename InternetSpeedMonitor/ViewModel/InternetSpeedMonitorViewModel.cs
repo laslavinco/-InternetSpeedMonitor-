@@ -1,7 +1,11 @@
 ﻿using InternetSpeedMonitor.Model;
 using System.ComponentModel;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using System.Timers;
+using System.Windows;
+using System.Windows.Media;
 
 namespace InternetSpeedMonitor.ViewModel
 {
@@ -14,6 +18,9 @@ namespace InternetSpeedMonitor.ViewModel
         private double _networkSpeed;
         private double _downloadedData;
         private double _uploadedData;
+        private bool _isConnected;
+        private NetworkInterface[] _networkInterfaces;
+        private string _seleectedInterface;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -25,12 +32,15 @@ namespace InternetSpeedMonitor.ViewModel
 
         private void SetStats()
         {
-            _speedMonitor.GetNetworkUsage();
+            _speedMonitor.GetNetworkUsage(_seleectedInterface);
+            NetworkInterfaces = NetworkInterfaces ?? _speedMonitor.GetAvailableNetworkInterfaces();
+            SelectedInterface = SelectedInterface ?? NetworkInterfaces.First().Name;
             DownloadSpeed = _speedMonitor.DownloadSpeed;
             UploadSpeed = _speedMonitor.UploadSpeed;
             NetworkSpeed = _speedMonitor.NetworkSpeed;
             DownloadedData = _speedMonitor.DownloadedData;
             UploadedData = _speedMonitor.UploadedData;
+            IsConnected = _speedMonitor.IsConnected;
         }
 
         private void SetTimer()
@@ -55,6 +65,19 @@ namespace InternetSpeedMonitor.ViewModel
                 return;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+        }
+
+        private ImageSource FindResource(string resourceKey)
+        {
+
+            try
+            {
+                return (ImageSource)Application.Current.MainWindow.FindResource(resourceKey);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public double DownloadedData
@@ -123,6 +146,44 @@ namespace InternetSpeedMonitor.ViewModel
             }
         }
 
+        public bool IsConnected 
+        { 
+            get
+            {
+                return _isConnected;
+            }
+            set
+            {
+                _isConnected = value;
+                OnPropertyChanged();
+                OnPropertyChanged("ConnectionStatus");
+            }
+        }
 
+        public ImageSource ConnectionStatus
+        {
+            get => FindResource(IsConnected ? "Connected" : "Disconnected");
+        }
+
+        public NetworkInterface[] NetworkInterfaces
+        {
+            get => _networkInterfaces;
+            set
+            {
+                _networkInterfaces = value;
+                OnPropertyChanged();
+            }
+
+        }
+
+        public string SelectedInterface
+        {
+            get => _seleectedInterface;
+            set
+            {
+                _seleectedInterface = value;
+                OnPropertyChanged();
+            }
+        }
     }
 }
