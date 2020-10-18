@@ -12,17 +12,18 @@
         WindowStartupLocation="Manual"
         Topmost="False"
         WindowStyle="None"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        AllowsTransparency="True">
 
     <Window.Resources>
         <BitmapImage x:Key="AppIcon" UriSource="Resources/appIcon.ico"/>
         <BitmapImage x:Key="Connected" UriSource="Resources/connected.ico"/>
         <BitmapImage x:Key="Disconnected" UriSource="Resources/disconnected.ico"/>
     </Window.Resources>
-    
 
 
-    <Grid Margin="1">
+
+    <Grid Margin="1" Opacity="{Binding ElementName=InternetSpeedMonitor, Path=WindowOpacity}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>

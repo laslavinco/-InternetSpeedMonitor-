@@ -1,20 +1,27 @@
 ﻿using InternetSpeedMonitor.ViewModel;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Media;
 
 namespace InternetSpeedMonitor
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private bool clicked = false;
         private Point lmAbs = new Point();
         private System.Windows.Forms.NotifyIcon ni;
+        private SolidColorBrush _backgroundBrush = new SolidColorBrush(Colors.White) { Opacity = 1.0};
+        private double _windowOpacity = 1.0;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public MainWindow()
         {
             if (IsWindowOpen("InternetSpeedMonitor"))
@@ -27,6 +34,9 @@ namespace InternetSpeedMonitor
             this.MouseDown += PnMouseDown;
             this.MouseUp += PnMouseUp;
             this.MouseMove += PnMouseMove;
+            this.Background = _backgroundBrush;
+            this.Deactivated += (sender, e) => WindowOpacity = 0.4;
+            this.Activated += (sender, e) => WindowOpacity = 1.0;
             SetMainWindowPosition();
         }
 
@@ -37,6 +47,7 @@ namespace InternetSpeedMonitor
 
             base.OnStateChanged(e);
         }
+
 
         private void SetupSystemTrayIcon()
         {
@@ -120,9 +131,28 @@ namespace InternetSpeedMonitor
                 ShutdownApp();
         }
 
-        private void PinOnTopButtonClicked(object sender, RoutedEventArgs e)
+        private void PinOnTopButtonClicked(object sender, RoutedEventArgs e) => this.Topmost = !(this.Topmost);
+        
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            this.Topmost = !(this.Topmost);
+            if (propertyName == null)
+                return;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        }
+
+        public double WindowOpacity
+        {
+            get
+            {
+                return _windowOpacity;
+            }
+            set
+            {
+                _backgroundBrush.Opacity = value;
+                _windowOpacity = value;
+                OnPropertyChanged();
+            }
         }
 
     }
